@@ -15,6 +15,8 @@
 		23087B7F20A43CAF00915345 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 23087B7E20A43CAF00915345 /* main.m */; };
 		23087B8920A43CAF00915345 /* BlockTestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 23087B8820A43CAF00915345 /* BlockTestTests.m */; };
 		23087B9420A43CAF00915345 /* BlockTestUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 23087B9320A43CAF00915345 /* BlockTestUITests.m */; };
+		23087BA320A43D2700915345 /* BlockTestViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 23087BA220A43D2700915345 /* BlockTestViewController.m */; };
+		23087BA620A54FFB00915345 /* BlockTestCycle.m in Sources */ = {isa = PBXBuildFile; fileRef = 23087BA520A54FFB00915345 /* BlockTestCycle.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +53,10 @@
 		23087B8F20A43CAF00915345 /* BlockTestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BlockTestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		23087B9320A43CAF00915345 /* BlockTestUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BlockTestUITests.m; sourceTree = "<group>"; };
 		23087B9520A43CAF00915345 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		23087BA120A43D2700915345 /* BlockTestViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BlockTestViewController.h; sourceTree = "<group>"; };
+		23087BA220A43D2700915345 /* BlockTestViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BlockTestViewController.m; sourceTree = "<group>"; };
+		23087BA420A54FFB00915345 /* BlockTestCycle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BlockTestCycle.h; sourceTree = "<group>"; };
+		23087BA520A54FFB00915345 /* BlockTestCycle.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BlockTestCycle.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +111,10 @@
 				23087B7020A43CAF00915345 /* AppDelegate.m */,
 				23087B7220A43CAF00915345 /* ViewController.h */,
 				23087B7320A43CAF00915345 /* ViewController.m */,
+				23087BA120A43D2700915345 /* BlockTestViewController.h */,
+				23087BA220A43D2700915345 /* BlockTestViewController.m */,
+				23087BA420A54FFB00915345 /* BlockTestCycle.h */,
+				23087BA520A54FFB00915345 /* BlockTestCycle.m */,
 				23087B7520A43CAF00915345 /* Main.storyboard */,
 				23087B7820A43CAF00915345 /* Assets.xcassets */,
 				23087B7A20A43CAF00915345 /* LaunchScreen.storyboard */,
@@ -267,6 +277,8 @@
 			files = (
 				23087B7420A43CAF00915345 /* ViewController.m in Sources */,
 				23087B7F20A43CAF00915345 /* main.m in Sources */,
+				23087BA320A43D2700915345 /* BlockTestViewController.m in Sources */,
+				23087BA620A54FFB00915345 /* BlockTestCycle.m in Sources */,
 				23087B7120A43CAF00915345 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -132,7 +132,7 @@ self.operation.completionBlock = ^{
 };
 [self.queue addOperation:self.operation];
 ```
-这时，在 completionBlock 中，编译器甚至已经给了我们 retain cycle 的警告，但是实际运行后可以得知，这里并不会发生循环引用，具体的原因在查阅苹果关于 NSOperation 的文档后，得到以下这段解释：
+这时，在 completionBlock 中，编译器甚至已经给了我们 retain cycle 的警告，但是实际运行后可以得知，这里并不会发生循环引用，具体的原因在查阅苹果关于 [ NSOperation 的文档](https://developer.apple.com/documentation/foundation/nsoperation/1408085-completionblock?preferredLanguage=occ)后，得到以下这段解释：
 
 `In iOS 8 and later and macOS 10.10 and later, this property is set to nil after the completion block begins executing.`
 

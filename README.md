@@ -5,7 +5,7 @@
 Block 是一种闭包语法，将代码像对象一样传递，最重要的特性是，Block 可以访问定义范围内的全部变量。
 Block 可以在多种场合使用，常见的场合包括但不限于通知回调、动画、多线程等。
 
-## 2.关于Block的结构和类型的一些研究
+## 2.Block的结构和类型研究
 
 对 Block 稍微了解的话，就会知道 Block 会在编译过程中，会被当作结构体进行处理。
 其大致的结构如下：
@@ -28,24 +28,24 @@ struct Block_layout {
 ```
 其中`isa`指针就指向表明 Block 类型的类。
 
-根据block 在内存中的位置，一般可分为三种类型：
+根据 Block 在内存中的位置，一般可分为三种类型：
+
 `_NSConcreteGlobalBlock`：全局的静态 block ，不会访问任何外部变量，不会涉及到任何拷贝，比如一个空的 block。这个类型的 block 要么是空 block ，要么是不访问任何外部变量的 block 。它既不在栈中，也不在堆中，我理解为它可能在内存的全局区。
+
 `_NSConcreteStackBlock`：保存在栈中的 block，当函数返回时被销毁。该类型的 block 有闭包行为，也就是有访问外部变量，并且该 block 只且只有有一次执行，因为栈中的空间是可重复使用的，所以当栈中的 block 执行一次之后就被清除出栈了，所以无法多次使用。
+
 `_NSConcreteMallocBlock`：保存在堆中的 block，当引用计数为0时被销毁。该类型的 block 都是由 _NSConcreteStackBlock 类型的 block 从栈中复制到堆中形成的。该类型的 block 有闭包行为，并且该 block 需要被多次执行。当需要多次执行时，就会把该 block 从栈中复制到堆中，供以多次执行。
 
-为了验证以上结论，我们可以写两个 block ，然后通过 clang 将其翻译成 C 。
+以上内容引用自[Objective-C中的Block](http://www.devtalking.com/articles/you-should-know-block/)。
+
+为了验证以上结论，这里写了两个 block ，然后通过 clang 将其翻译成 C 语言。
+
+A：
 ```objc
 ^{ printf("Hello, World!\n"); } ();
 ```
-```objc
- __block int val = 0;
- void (^blk)(void) = ^{val = 1;};
- blk();
-```
-第一个是个空 block ，不涉及外部变量的拷贝。第二个是一个有外部变量访问的 block 。 NSConcreteMallocBlock 类型的 block 通常不会在源码中直接出现，因为默认它是当一个 block 被 copy 的时候，才会将这个 block 复制到堆中，所以这里暂不讨论。
-
-通过clang 翻译之后，得到以下两段关键区域代码：
-
+这是个空 block ，不涉及外部变量的拷贝。
+通过 clang 翻译后，得到如下关键区域代码：
 ```c++
 struct __main_block_impl_0 {
   struct __block_impl impl;
@@ -65,6 +65,24 @@ static struct __main_block_desc_0 {
   size_t Block_size;
 } __main_block_desc_0_DATA = { 0, sizeof(struct __main_block_impl_0)};
 ```
+从C代码中可以看到，`isa` 指针指向的是 _NSConcreteStackBlock ，按照之前的理论，应该是指向 _NSConcreteGlobalBlock 。
+这里通过查阅相关资料可知：
+> 由于 clang 改写的具体实现方式和 LLVM 不太一样，并且这里没有开启 ARC 。所以这里我们看到 isa 指向的还是 _NSConcreteStackBlock。但在 LLVM 的实现中，开启 ARC 时，block 应该是 _NSConcreteGlobalBlock 类型。
+关于是否开启 ARC 对于 block 类型的影响，在 ARC 开启的情况下，将只会有 _NSConcreteGlobalBlock 和 _NSConcreteMallocBlock 类型的 block。
+比如我们将第二段代码中的 blk() 进行打印，可以得到以下信息：
+```c++
+2018-05-16 11:29:57.405094+0800 BlockTest[7696:7587452] <__NSMallocBlock__: 0x60000004d1a0>
+```
+证明以上结论正确。
+
+B:
+```objc
+ __block int val = 0;
+ void (^blk)(void) = ^{val = 1;};
+ blk();
+```
+第二个例子是一个有外部变量访问的 block 。 
+通过clang 翻译之后，得到如下C代码：
 ```c++
 struct __main_block_impl_1 {
   struct __block_impl impl;
@@ -84,17 +102,11 @@ static void __main_block_copy_1(struct __main_block_impl_1*dst, struct __main_bl
 
 static void __main_block_dispose_1(struct __main_block_impl_1*src) {_Block_object_dispose((void*)src->val, 8/*BLOCK_FIELD_IS_BYREF*/);}
 ```
-第一段代码中可以看到，isa 指针指向的是 _NSConcreteStackBlock ，按照先前的理论，应该是指向 _NSConcreteGlobalBlock 才对。通过查阅相关资料可知，由于 clang 改写的具体实现方式和 LLVM 不太一样，并且这里没有开启 ARC 。所以这里我们看到 isa 指向的还是 _NSConcreteStackBlock。但在 LLVM 的实现中，开启 ARC 时，block 应该是 _NSConcreteGlobalBlock 类型。
-第二段代码，isa 指向 _NSConcreteStackBlock，说明这是一个分配在栈上的实例。
+`isa` 指向 _NSConcreteStackBlock，说明这是一个分配在栈上的实例。
 
-关于是否开启 ARC 对于 block 类型的影响，在 ARC 开启的情况下，将只会有 _NSConcreteGlobalBlock 和 _NSConcreteMallocBlock 类型的 block。
-比如我们将第二段代码中的 blk() 进行打印，可以得到以下信息：
-```c++
-2018-05-16 11:29:57.405094+0800 BlockTest[7696:7587452] <__NSMallocBlock__: 0x60000004d1a0>
-```
-证明结论正确。
+NSConcreteMallocBlock 类型的 block 通常不会在源码中直接出现，因为默认它是当一个 block 被 copy 的时候，才会将这个 block 复制到堆中。
 
-## 3.Block使用时不会造成循环引用的几种情况
+## 3.Block不会造成循环引用的几种情况
 
 正常情况下，当 block 不是 self 的属性时，self 不持有 block ，不会发生循环引用，如：
 ```objc
@@ -120,6 +132,7 @@ self.queue = [[NSOperationQueue alloc] init];
     [self.queue addOperation:self.operation];
 ```
 这时，在 completionBlock 中，编译器甚至已经给了我们 retain cycle 的警告，但是实际运行后可以得知，这里并不会发生循环引用，具体的原因在查阅苹果关于 NSOperation 的文档后，得到以下这段解释：
+
 `In iOS 8 and later and macOS 10.10 and later, this property is set to nil after the completion block begins executing.`
 
 ## 4.Block的循环引用问题(retain cycle)

@@ -36,7 +36,7 @@ struct Block_layout {
 
 `_NSConcreteMallocBlock`：保存在堆中的 block，当引用计数为0时被销毁。该类型的 block 都是由 _NSConcreteStackBlock 类型的 block 从栈中复制到堆中形成的。该类型的 block 有闭包行为，并且该 block 需要被多次执行。当需要多次执行时，就会把该 block 从栈中复制到堆中，供以多次执行。
 
-以上内容引用自[Objective-C中的Block](http://www.devtalking.com/articles/you-should-know-block/)。
+以上内容引用自 [Objective-C中的Block](http://www.devtalking.com/articles/you-should-know-block/)。
 
 为了验证以上结论，这里写了两个 block ，然后通过 clang 将其翻译成 C 语言。
 
@@ -132,7 +132,7 @@ self.operation.completionBlock = ^{
 };
 [self.queue addOperation:self.operation];
 ```
-这时，在 completionBlock 中，编译器甚至已经给了我们 retain cycle 的警告，但是实际运行后可以得知，这里并不会发生循环引用，具体的原因在查阅苹果关于 [ NSOperation 的文档](https://developer.apple.com/documentation/foundation/nsoperation/1408085-completionblock?preferredLanguage=occ)后，得到以下这段解释：
+这时，在 completionBlock 中，编译器甚至已经给了我们 retain cycle 的警告，但是实际运行后可以得知，这里并不会发生循环引用，具体的原因在查阅苹果[关于 NSOperation 的文档](https://developer.apple.com/documentation/foundation/nsoperation/1408085-completionblock?preferredLanguage=occ)后，得到以下这段解释：
 
 `In iOS 8 and later and macOS 10.10 and later, this property is set to nil after the completion block begins executing.`
 

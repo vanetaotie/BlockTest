@@ -68,7 +68,8 @@ static struct __main_block_desc_0 {
 从C代码中可以看到，`isa` 指针指向的是 _NSConcreteStackBlock ，按照之前的理论，应该是指向 _NSConcreteGlobalBlock 。
 这里通过查阅相关资料可知：
 > 由于 clang 改写的具体实现方式和 LLVM 不太一样，并且这里没有开启 ARC 。所以这里我们看到 isa 指向的还是 _NSConcreteStackBlock。但在 LLVM 的实现中，开启 ARC 时，block 应该是 _NSConcreteGlobalBlock 类型。
-关于是否开启 ARC 对于 block 类型的影响，在 ARC 开启的情况下，将只会有 _NSConcreteGlobalBlock 和 _NSConcreteMallocBlock 类型的 block。
+
+关于是否开启 ARC 对于 block 类型的影响的问题，在 ARC 开启的情况下，将只会有 _NSConcreteGlobalBlock 和 _NSConcreteMallocBlock 类型的 block。
 比如我们将第二段代码中的 blk() 进行打印，可以得到以下信息：
 ```c++
 2018-05-16 11:29:57.405094+0800 BlockTest[7696:7587452] <__NSMallocBlock__: 0x60000004d1a0>
@@ -111,25 +112,25 @@ NSConcreteMallocBlock 类型的 block 通常不会在源码中直接出现，因
 正常情况下，当 block 不是 self 的属性时，self 不持有 block ，不会发生循环引用，如：
 ```objc
 void (^blkk)(void) =  ^{
-        NSLog(@"self==%@",self);
-    };
-    blkk();
+    NSLog(@"self==%@",self);
+};
+blkk();
 ```
 另外，调用系统类方法时，也不会发生循环引用，比如使用 UIView 动画：
 ```objc
 [UIView animateWithDuration:0.5 animations:^{
-        NSLog(@"self==%@",self);
-    }];
+    NSLog(@"self==%@",self);
+}];
 ```
 
 还有一种情况，比如使用了系统的 NSOperation 对象，如下面这段示例代码：
 ```objc
 self.queue = [[NSOperationQueue alloc] init];
-    self.operation = [[NSOperation alloc] init];
-    self.operation.completionBlock = ^{
-        NSLog(@"self==%@",self);
-    };
-    [self.queue addOperation:self.operation];
+self.operation = [[NSOperation alloc] init];
+self.operation.completionBlock = ^{
+    NSLog(@"self==%@",self);
+};
+[self.queue addOperation:self.operation];
 ```
 这时，在 completionBlock 中，编译器甚至已经给了我们 retain cycle 的警告，但是实际运行后可以得知，这里并不会发生循环引用，具体的原因在查阅苹果关于 NSOperation 的文档后，得到以下这段解释：
 

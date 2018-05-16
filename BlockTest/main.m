@@ -18,6 +18,8 @@ int main(int argc, char * argv[]) {
         void (^blk)(void) = ^{val = 1;};
         blk();
         
+        NSLog(@"%@", blk);
+        
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
     }
 }

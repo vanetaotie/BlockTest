@@ -107,7 +107,7 @@ static void __main_block_dispose_1(struct __main_block_impl_1*src) {_Block_objec
 
 NSConcreteMallocBlock 类型的 block 通常不会在源码中直接出现，因为默认它是当一个 block 被 copy 的时候，才会将这个 block 复制到堆中。
 
-## 3.Block不会造成循环引用的几种情况
+## 3.常见的非Retain Cycle的Block类型
 
 正常情况下，当 block 不是 self 的属性时，self 不持有 block ，不会发生循环引用，如：
 ```objc
@@ -135,6 +135,8 @@ self.operation.completionBlock = ^{
 这时，在 completionBlock 中，编译器甚至已经给了我们 retain cycle 的警告，但是实际运行后可以得知，这里并不会发生循环引用，具体的原因在查阅苹果关于 NSOperation 的文档后，得到以下这段解释：
 
 `In iOS 8 and later and macOS 10.10 and later, this property is set to nil after the completion block begins executing.`
+
+由此得知 Apple 在内部做了置空处理，所以这里可以放心使用。
 
 ## 4.Block的循环引用问题(retain cycle)
 
